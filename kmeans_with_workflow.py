@@ -2,10 +2,8 @@
 from csv import reader
 from sklearn.cluster import KMeans
 import joblib
-import ray
-
-
-ray.init()
+from dask import delayed
+import dask
 
 
 # Load a CSV file
@@ -47,18 +45,18 @@ def getRawIrisData():
 
     return dataset
 
-@ray.remote
+@dask.delayed
 def getTrainData():
     dataset = getRawIrisData()
     trainData = [ [one[0], one[1], one[2], one[3]] for one in dataset ]
 
     return trainData
 
-@ray.remote
+@dask.delayed
 def getNumClusters():
     return 3
 
-@ray.remote
+@dask.delayed
 def train(numClusters, trainData):
     print("numClusters=%d" % numClusters)
 
@@ -71,7 +69,7 @@ def train(numClusters, trainData):
 
     return trainData
 
-@ray.remote
+@dask.delayed
 def predict(irisData):
     # test saved prediction
     model = joblib.load('model.kmeans')
@@ -84,15 +82,18 @@ def predict(irisData):
 
 
 def machine_learning_workflow_pipeline():
-    trainData = getTrainData.remote()
-    numClusters = getNumClusters.remote()
-    trainData = train.remote(numClusters, trainData)
-    result = predict.remote(trainData)
+    trainData = getTrainData()
+    numClusters = getNumClusters()
+    trainData = train(numClusters, trainData)
+    total = predict(trainData)
 
-    result = ray.get(result)
-    print("result=", result)
+    #total.visualize()
+
+    total.compute()
 
 
 
 if __name__ == "__main__":
     machine_learning_workflow_pipeline()
+
+

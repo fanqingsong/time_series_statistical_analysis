@@ -70,7 +70,6 @@ greenlet==0.4.17
 grpcio==1.30.0
 hiredis==1.1.0
 humanfriendly==8.2
-hydralib==5.57.3
 idna==2.5
 idna-ssl==1.1.0
 imagesize==1.2.0
@@ -164,3 +163,5 @@ yarl==1.5.1
 zipp==1.2.0
 zope.event==4.4
 zope.interface==5.1.0
+dask[complete]==2.30.0
+

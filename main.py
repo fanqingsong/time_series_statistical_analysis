@@ -1,13 +1,15 @@
 
-from src import machine_learning_workflow_pipeline
+import src
 from watchfiles import watch
-
+import importlib
 
 if __name__ == "__main__":
-    machine_learning_workflow_pipeline()
+    src.machine_learning_workflow_pipeline()
 
     for changes in watch('./src'):
         print(changes)
-        machine_learning_workflow_pipeline()
+        importlib.reload(src.kmeans_with_workflow)
+        importlib.reload(src)
+        src.machine_learning_workflow_pipeline()
 
 

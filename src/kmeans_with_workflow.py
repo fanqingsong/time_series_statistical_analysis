@@ -3,6 +3,9 @@ from csv import reader
 from sklearn.cluster import KMeans
 import joblib
 import dask
+from .Ashare.Ashare import *
+from .Ashare.MyTT import *
+import matplotlib.pyplot as plt ;  from matplotlib.ticker import MultipleLocator
 
 
 # Load a CSV file
@@ -94,13 +97,45 @@ def predict(irisData):
     print(labels)
 
 
-def machine_learning_workflow_pipeline():
-    trainData = getTrainData()
-    numClusters = getNumClusters()
-    trainData = train(numClusters, trainData)
-    total = predict(trainData)
+@dask.delayed
+def get_data():
+    df = get_price('sh000001', frequency='1d', count=100)
+    # print(df)
+    return df
 
-    total.compute()
+
+@dask.delayed
+def visualize(df):
+    CLOSE = df.close.values
+    print(CLOSE)
+
+    MA5 = MA(CLOSE, 5)
+    print(MA5)
+
+    plt.figure(figsize=(15,8))
+    plt.plot(CLOSE,label='SHZS');
+    plt.legend();
+    plt.grid(linewidth=0.5,alpha=0.7);
+    plt.gcf().autofmt_xdate(rotation=45);
+    plt.gca().xaxis.set_major_locator(MultipleLocator(len(CLOSE)/30))    #日期最多显示30个
+    plt.title('SH-INDEX   &   BOLL SHOW',fontsize=20);
+    plt.show()
+
+
+
+def machine_learning_workflow_pipeline():
+    # trainData = getTrainData()
+    # numClusters = getNumClusters()
+    # trainData = train(numClusters, trainData)
+    # total = predict(trainData)
+    #
+    # total.compute()
+
+    df = get_data()
+    vr = visualize(df)
+    vr.compute()
+    print("-------lllllkkkkkooo")
+    # print(df.compute())
 
 
 
